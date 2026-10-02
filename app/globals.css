@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens. The palette comes from Images Clegal/PALETA-COLORES.png and
+ * mirrors lib/brand.ts. Tailwind's default colour scale is cleared so only
+ * these tokens exist as utilities (bg-ink, text-green, border-line, …).
+ * Every neutral/tint is a color-mix() of palette tokens — no ad-hoc hex codes.
+ */
+@theme {
+  --color-*: initial;
+
+  /* Palette */
+  --color-ink: #10102a;
+  --color-blue: #1b33c8;
+  --color-purple: #c200ff;
+  --color-green: #04dd75;
+  --color-white: #ffffff;
+
+  /* Derived neutrals and tints */
+  --color-ink-muted: color-mix(in srgb, var(--color-ink) 72%, var(--color-white));
+  --color-ink-subtle: color-mix(in srgb, var(--color-ink) 55%, var(--color-white));
+  --color-ink-faint: color-mix(in srgb, var(--color-ink) 35%, var(--color-white));
+  --color-line: color-mix(in srgb, var(--color-ink) 12%, var(--color-white));
+  --color-line-strong: color-mix(in srgb, var(--color-ink) 70%, var(--color-white));
+  --color-surface: color-mix(in srgb, var(--color-ink) 4%, var(--color-white));
+  --color-green-soft: color-mix(in srgb, var(--color-green) 12%, var(--color-white));
+  --color-green-strong: color-mix(in srgb, var(--color-green) 85%, var(--color-ink));
+  --color-purple-soft: color-mix(in srgb, var(--color-purple) 10%, var(--color-white));
+  --color-purple-strong: color-mix(in srgb, var(--color-purple) 85%, var(--color-ink));
+  --color-danger: color-mix(in srgb, var(--color-purple) 55%, var(--color-ink));
+
+  /* Text on the green accent. The design uses white; switch to var(--color-ink)
+     for WCAG AA contrast if required. */
+  --color-on-green: var(--color-white);
+
+  --shadow-header: 0 6px 24px -12px color-mix(in srgb, var(--color-ink) 22%, transparent);
+  --shadow-card: 0 10px 30px -12px color-mix(in srgb, var(--color-ink) 22%, transparent);
+  --shadow-glow: 0 0 0 1px color-mix(in srgb, var(--color-green) 12%, transparent),
+    0 12px 48px -8px color-mix(in srgb, var(--color-green) 45%, transparent);
+
+  --breakpoint-xs: 30rem;
+
+  --animate-dialog-in: dialog-in 180ms ease-out;
+  --animate-fade-in: fade-in 180ms ease-out;
+
+  @keyframes dialog-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background-color: var(--color-white);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-blue);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  ::selection {
+    background-color: var(--color-green-soft);
+  }
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+  dialog::backdrop {
+    background-color: color-mix(in srgb, var(--color-ink) 62%, transparent);
+    backdrop-filter: blur(4px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .container-page {
+    width: 100%;
+    max-width: 78rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 48rem) {
+    .container-page {
+      padding-inline: 2rem;
+    }
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    transition:
+      background-color 150ms ease,
+      color 150ms ease,
+      border-color 150ms ease,
+      box-shadow 150ms ease,
+      transform 150ms ease;
+    cursor: pointer;
+  }
+  .btn:active {
+    transform: translateY(1px);
+  }
+  .btn-primary {
+    background-color: var(--color-green);
+    color: var(--color-on-green);
+  }
+  .btn-primary:hover {
+    background-color: var(--color-green-strong);
+  }
+  .btn-outline {
+    border: 1.5px solid var(--color-line-strong);
+    color: var(--color-ink-muted);
+    background-color: var(--color-white);
+  }
+  .btn-outline:hover {
+    border-color: var(--color-ink);
+    color: var(--color-ink);
+    background-color: var(--color-surface);
+  }
+  .btn-purple {
+    background-color: var(--color-purple);
+    color: var(--color-white);
+  }
+  .btn-purple:hover {
+    background-color: var(--color-purple-strong);
+  }
+}
