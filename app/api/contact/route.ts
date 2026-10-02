@@ -1,16 +1,28 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { contactSchema, HONEYPOT_FIELD, toFieldErrors } from "@/lib/contact/schema";
 import { DispatchError, dispatchLeadEmails } from "@/lib/email/dispatch";
-import { EnvError, getServerEnv } from "@/lib/env";
+import { contactRateLimit, EnvError, getServerEnv } from "@/lib/env";
 import { clientIp, createRateLimiter } from "@/lib/rate-limit";
-import { SITE_URL } from "@/lib/site";
+import { baseUrl } from "@/lib/site";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const MAX_BODY_BYTES = 16 * 1024;
-// 5 submissions per IP per 10 minutes.
-const limiter = createRateLimiter({ limit: 5, windowMs: 10 * 60 * 1000 });
+// CONTACT_RATE_LIMIT successful submissions per IP per 10 minutes (default 5), same as DATASHEQ.
+let limiter: ReturnType<typeof createRateLimiter> | null = null;
+function getLimiter() {
+  limiter ??= createRateLimiter({ limit: contactRateLimit(), windowMs: 10 * 60 * 1000 });
+  return limiter;
+}
+
+/** Public origin of the incoming request (Railway terminates TLS in front of the app). */
+function requestOrigin(request: NextRequest): string | null {
+  const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  if (!host) return null;
+  const proto = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim() || request.nextUrl.protocol.replace(":", "");
+  return `${proto}://${host.split(",")[0]!.trim()}`;
+}
 
 type ErrorCode = "invalid_json" | "payload_too_large" | "validation" | "rate_limited" | "config" | "delivery" | "unsupported_media_type" | "method_not_allowed";
 
@@ -53,7 +65,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Only submissions that would actually send email count against the limit.
-  const rate = limiter.check(ip);
+  const rate = getLimiter().check(ip);
   if (!rate.ok) {
     return error(429, "rate_limited", { retryAfter: rate.retryAfterSec }, { "Retry-After": String(rate.retryAfterSec) });
   }
@@ -73,7 +85,7 @@ export async function POST(request: NextRequest) {
         receivedAt: new Date(),
         ip,
         userAgent: request.headers.get("user-agent") ?? "unknown",
-        siteUrl: process.env.NEXT_PUBLIC_SITE_URL ? SITE_URL : null,
+        siteUrl: baseUrl(requestOrigin(request)),
       },
       env,
     );

@@ -11,7 +11,7 @@ form that dispatches two SendGrid emails.
 ## Quick start
 
 ```bash
-cp .env.example .env          # fill in SendGrid values, or set SENDGRID_DRY_RUN=1
+cp .env.example .env          # optional: without SendGrid values, emails are saved to ./.mail-outbox
 npm install
 npm run dev                   # http://localhost:3000
 ```
@@ -26,37 +26,46 @@ npm run dev                   # http://localhost:3000
 
 ## Environment variables
 
-| Variable                     | Required | Notes                                                                                   |
-| ---------------------------- | -------- | --------------------------------------------------------------------------------------- |
-| `PORT`                       | yes\*    | Injected by Railway. Defaults to 3000 locally.                                          |
-| `SENDGRID_API_KEY`           | yes      | API key with **Mail Send** permission.                                                  |
-| `SENDGRID_SENDER_EMAIL`      | yes      | Must be a verified Single Sender or on an authenticated domain in SendGrid. Alias: `SENDGRID_FROM_EMAIL`. |
-| `ADMIN_EMAIL`                | yes      | Company inbox that receives every lead (comma-separate several). Alias: `CONTACT_TO_EMAIL`. |
-| `SENDGRID_SENDER_NAME`       | no       | "From" display name. Default `C-Legal`. Alias: `SENDGRID_FROM_NAME`.                    |
-| `SENDGRID_DRY_RUN`           | no       | `1` logs emails instead of sending (local/staging). API key not required in this mode.  |
-| `NEXT_PUBLIC_SITE_URL`       | no       | Public origin. Used for canonical/OG URLs and the logo image in emails. **Build-time.**  |
-| `NEXT_PUBLIC_LOGIN_URL`      | no       | Shows the purple "Inicio de sesión" button when set. **Build-time.**                    |
-| `NEXT_PUBLIC_APP_STORE_URL`  | no       | Makes the App Store badge a link and renders its QR code. **Build-time.**               |
-| `NEXT_PUBLIC_PLAY_STORE_URL` | no       | Same for Google Play. **Build-time.**                                                   |
-| `NEXT_PUBLIC_DATASHEQ_URL`   | no       | Target of "Conoce nuestras soluciones". Without it the button opens the contact modal.  |
+**Same variables as the DATASHEQ site** — both Railway services are configured the same way.
+Links are not variables: login, App Store / Google Play and the Datasheq site are set in
+`lib/site.ts` (edit and redeploy to change them).
 
-The aliases are the variable names used by the DATASHEQ site, so both services can share the same
-set of Railway variables (for example via a shared variable group).
+| Variable | Required | Purpose |
+|---|---|---|
+| `SENDGRID_API_KEY` | yes | API key with **Mail Send** permission |
+| `SENDGRID_FROM_EMAIL` | yes | Sender address — must be verified in SendGrid |
+| `SENDGRID_FROM_NAME` | no | Sender name (default `C-Legal`) |
+| `CONTACT_TO_EMAIL` | yes | Company inbox(es) that receive each request, comma-separated |
+| `CLIENT_REPLY_TO` | no | Reply-To on the client email (default: first `CONTACT_TO_EMAIL`) |
+| `PUBLIC_BASE_URL` | no | e.g. `https://clegal.datasheq.com`. Used for the logo/links in emails, QR codes and SEO tags. Defaults to Railway's public domain |
+| `SENDGRID_SANDBOX` | no | `true` = SendGrid validates but doesn't deliver (testing) |
+| `SENDGRID_DATA_RESIDENCY` | no | `eu` only for EU-residency SendGrid subusers |
+| `CONTACT_RATE_LIMIT` | no | Successful submissions per IP per 10 min (default 5) |
 
-Secrets are only read server-side and validated lazily (`lib/env.ts`), so `next build` does not
-need them. `GET /api/health` reports `email: configured | dry-run | misconfigured` without
-exposing values.
+Railway sets `PORT` and `RAILWAY_PUBLIC_DOMAIN` itself. The previous names `SENDGRID_SENDER_EMAIL`,
+`SENDGRID_SENDER_NAME` and `ADMIN_EMAIL` still work as fallbacks.
+
+Without SendGrid configured, development saves both emails to `./.mail-outbox` (open them in a
+browser); in production the form returns an error instead. `GET /healthz` (also `/api/health`)
+returns `{ status, version, mail: { configured, sandbox } }` without exposing values.
+
+### Links (`lib/site.ts`)
+
+| Setting | Value | Used by |
+|---|---|---|
+| `loginUrl` | `https://app.datasheq.com` | "Inicio de sesión" button |
+| `datasheqUrl` | `https://web.datasheq.com` | "Conoce nuestras soluciones" |
+| `app.appStoreUrl` / `app.googlePlayUrl` | empty (fill in when published) | Store icons and QR codes, via `/app/ios` and `/app/android` (they open the "Descarga" section while empty) |
 
 ## Deploying to Railway
 
 1. Push this folder to a Git repository and create a Railway service from it
    (or run `railway up` from this folder with the Railway CLI).
-2. Railway reads `railway.toml`: Dockerfile build, health check on `/api/health`, restart on failure.
-3. In **Variables**, add `SENDGRID_API_KEY`, `SENDGRID_SENDER_EMAIL`, `ADMIN_EMAIL`
-   (and any optional ones). Railway sets `PORT` itself.
-4. Generate a domain (or attach a custom one), set `NEXT_PUBLIC_SITE_URL` to it, and **redeploy** —
-   `NEXT_PUBLIC_*` values are compiled into the build (the Dockerfile declares them as `ARG`,
-   which is how Railway passes variables to Docker builds).
+2. Railway reads `railway.toml`: Dockerfile build, health check on `/healthz`, restart on failure.
+3. In **Variables**, add `SENDGRID_API_KEY`, `SENDGRID_FROM_EMAIL`, `CONTACT_TO_EMAIL`
+   (and any optional ones) — the same as the DATASHEQ service. Railway sets `PORT` itself.
+4. Generate a domain (or attach a custom one). Optionally set `PUBLIC_BASE_URL` to it; otherwise
+   the Railway domain is used.
 5. In SendGrid: verify the sender (Settings → Sender Authentication). Domain authentication
    (SPF/DKIM) is strongly recommended so confirmations don't land in spam.
 
@@ -73,13 +82,13 @@ service is ever scaled to several replicas, move it to Redis.
 2. Honeypot field (`company_website`): bots get a fake `200`, nothing is sent.
 3. Zod validation with the **same schema the modal uses** (`lib/contact/schema.ts`).
    Errors return `422` with per-field codes that the UI localizes.
-4. Rate limit: 5 accepted submissions per IP per 10 minutes → `429`.
+4. Rate limit: `CONTACT_RATE_LIMIT` (default 5) accepted submissions per IP per 10 minutes → `429`.
 5. Dispatch (`lib/email/dispatch.ts`):
    - both emails are rendered before any network call;
-   - **internal notification** → `ADMIN_EMAIL`, Reply-To = the lead (reply goes straight to them);
+   - **internal notification** → `CONTACT_TO_EMAIL`, Reply-To = the lead (reply goes straight to them);
      if SendGrid rejects it the request fails with `502`, nothing goes to the client, and the
      visitor can safely retry;
-   - **client confirmation** → the visitor, Reply-To = `ADMIN_EMAIL`; sent only after the lead is
+   - **client confirmation** → the visitor, Reply-To = `CLIENT_REPLY_TO` (or the first `CONTACT_TO_EMAIL`); sent only after the lead is
      delivered. If this second call fails the lead is already captured, so the API returns `200`
      with `confirmation: "failed"` and logs the error.
 

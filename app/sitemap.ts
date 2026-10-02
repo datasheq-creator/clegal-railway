@@ -1,10 +1,13 @@
 import type { MetadataRoute } from "next";
-import { SITE_URL } from "@/lib/site";
+import { baseUrl } from "@/lib/site";
+
+export const dynamic = "force-dynamic";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const languages = { "es-CL": `${SITE_URL}/`, en: `${SITE_URL}/en` };
+  const site = baseUrl();
+  const languages = { "es-CL": `${site}/`, en: `${site}/en` };
   return [
-    { url: `${SITE_URL}/`, changeFrequency: "monthly", priority: 1, alternates: { languages } },
-    { url: `${SITE_URL}/en`, changeFrequency: "monthly", priority: 0.8, alternates: { languages } },
+    { url: `${site}/`, changeFrequency: "monthly", priority: 1, alternates: { languages } },
+    { url: `${site}/en`, changeFrequency: "monthly", priority: 0.8, alternates: { languages } },
   ];
 }

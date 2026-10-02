@@ -16,13 +16,11 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# NEXT_PUBLIC_* values are inlined into the bundle at build time. Railway only
-# exposes service variables to a Dockerfile build when they are declared as ARG.
-ARG NEXT_PUBLIC_SITE_URL
-ARG NEXT_PUBLIC_LOGIN_URL
-ARG NEXT_PUBLIC_APP_STORE_URL
-ARG NEXT_PUBLIC_PLAY_STORE_URL
-ARG NEXT_PUBLIC_DATASHEQ_URL
+# The site's public URL is used for canonical/OG tags in the prerendered pages.
+# Railway only exposes variables to a Dockerfile build when they are declared as ARG.
+# (Same variable as the DATASHEQ site; RAILWAY_PUBLIC_DOMAIN is set by Railway itself.)
+ARG PUBLIC_BASE_URL
+ARG RAILWAY_PUBLIC_DOMAIN
 ENV NEXT_OUTPUT_STANDALONE=1
 RUN npm run build
 
@@ -39,5 +37,5 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 USER nextjs
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||3000)+'/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+  CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||3000)+'/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 CMD ["node", "server.js"]

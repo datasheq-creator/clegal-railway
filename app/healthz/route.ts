@@ -3,7 +3,7 @@ import { healthResponse } from "@/lib/http/health";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** Kept for compatibility; same payload as /healthz. */
+/** Liveness probe for Railway (railway.toml → healthcheckPath), same path as the DATASHEQ site. */
 export function GET() {
   return healthResponse();
 }

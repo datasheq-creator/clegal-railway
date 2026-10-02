@@ -11,3 +11,4 @@ Dockerfile
 .dockerignore
 npm-debug.log*
 .DS_Store
+.mail-outbox

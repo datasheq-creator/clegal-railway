@@ -1,4 +1,6 @@
 import "server-only";
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
 import sgMail, { type MailDataRequired } from "@sendgrid/mail";
 import type { ContactPayload } from "@/lib/contact/schema";
 import type { ServerEnv } from "@/lib/env";
@@ -8,6 +10,7 @@ import { buildConfirmationEmail, buildInternalEmail, type LeadMeta } from "./tem
 export interface MailClient {
   setApiKey(key: string): void;
   setTimeout?(ms: number): void;
+  client?: { setDataResidency?(region: string): void };
   send(data: MailDataRequired): Promise<unknown>;
 }
 
@@ -21,7 +24,7 @@ export class DispatchError extends Error {
   }
 }
 
-export type DispatchResult = { internal: "sent" | "dry-run"; confirmation: "sent" | "failed" | "dry-run" };
+export type DispatchResult = { internal: "sent" | "outbox"; confirmation: "sent" | "failed" | "outbox" };
 
 /** Extracts SendGrid's error details without leaking the API key. */
 export function describeError(err: unknown): string {
@@ -44,6 +47,21 @@ const trackingOff = {
   openTracking: { enable: false },
 } as const;
 
+/** Development without SendGrid: save each email as an HTML file in ./.mail-outbox (same as DATASHEQ). */
+async function writeToOutbox(msg: MailDataRequired): Promise<void> {
+  const dir = path.join(process.cwd(), ".mail-outbox");
+  await mkdir(dir, { recursive: true });
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const slug = String(msg.subject).toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 50);
+  const to = ([] as unknown[])
+    .concat(msg.to)
+    .map((x) => (typeof x === "string" ? x : (x as { email: string }).email))
+    .join(", ");
+  const file = path.join(dir, `${stamp}-${slug}.html`);
+  await writeFile(file, `<!-- To: ${to} | Subject: ${msg.subject} -->\n${String(msg.html)}`);
+  console.info(`[mail:dev] "${msg.subject}" → ${to} (saved to ${path.relative(process.cwd(), file)})`);
+}
+
 /**
  * Sends the two lead emails.
  *
@@ -58,15 +76,15 @@ export async function dispatchLeadEmails(
   lead: ContactPayload,
   meta: LeadMeta,
   env: ServerEnv,
-  client: MailClient = sgMail,
+  client: MailClient = sgMail as unknown as MailClient,
 ): Promise<DispatchResult> {
   const internal = buildInternalEmail(lead, meta);
   const confirmation = buildConfirmationEmail(lead, meta);
-  const from = { email: env.SENDGRID_SENDER_EMAIL, name: env.SENDGRID_SENDER_NAME };
-  // Company inbox(es) from ADMIN_EMAIL / CONTACT_TO_EMAIL (Railway variable).
-  const admins = env.ADMIN_EMAILS;
+  const from = { email: env.SENDGRID_FROM_EMAIL, name: env.SENDGRID_FROM_NAME };
+  // Company inbox(es) from the Railway variable CONTACT_TO_EMAIL.
+  const admins = env.CONTACT_TO_EMAILS;
   const companyTo = admins.length === 1 ? admins[0]! : admins;
-  const companyReplyTo = admins[0]!;
+  const mailSettings = { sandboxMode: { enable: env.SENDGRID_SANDBOX } };
 
   const internalMsg: MailDataRequired = {
     to: companyTo,
@@ -77,29 +95,30 @@ export async function dispatchLeadEmails(
     text: internal.text,
     categories: ["clegal-lead", "internal"],
     trackingSettings: trackingOff,
+    mailSettings,
   };
 
   const confirmationMsg: MailDataRequired = {
     to: { email: lead.email, name: lead.name },
     from,
-    replyTo: companyReplyTo,
+    replyTo: env.CLIENT_REPLY_TO,
     subject: confirmation.subject,
     html: confirmation.html,
     text: confirmation.text,
     categories: ["clegal-lead", "confirmation"],
     trackingSettings: trackingOff,
+    mailSettings,
   };
 
-  if (env.SENDGRID_DRY_RUN) {
-    console.info("[contact] SENDGRID_DRY_RUN=1 — emails not sent", {
-      internal: { to: internalMsg.to, subject: internalMsg.subject },
-      confirmation: { to: lead.email, subject: confirmationMsg.subject },
-    });
-    return { internal: "dry-run", confirmation: "dry-run" };
+  if (env.mode === "outbox") {
+    await writeToOutbox(internalMsg);
+    await writeToOutbox(confirmationMsg);
+    return { internal: "outbox", confirmation: "outbox" };
   }
 
-  client.setApiKey(env.SENDGRID_API_KEY as string);
-  client.setTimeout?.(10_000);
+  client.setApiKey(env.SENDGRID_API_KEY);
+  client.setTimeout?.(15_000);
+  if (env.SENDGRID_DATA_RESIDENCY === "eu") client.client?.setDataResidency?.("eu");
 
   try {
     await client.send(internalMsg);

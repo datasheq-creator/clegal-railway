@@ -9,11 +9,13 @@ vi.mock("@sendgrid/mail", () => ({
 
 const { POST, GET } = await import("@/app/api/contact/route");
 
+// Same Railway variable names as the DATASHEQ site.
 const ENV = {
   SENDGRID_API_KEY: "SG.test",
-  SENDGRID_SENDER_EMAIL: "noreply@clegal.example",
-  ADMIN_EMAIL: "leads@clegal.example",
+  SENDGRID_FROM_EMAIL: "noreply@clegal.example",
+  CONTACT_TO_EMAIL: "leads@clegal.example",
 };
+const CLEARED = ["ADMIN_EMAIL", "SENDGRID_SENDER_EMAIL", "SENDGRID_SENDER_NAME", "CLIENT_REPLY_TO", "SENDGRID_SANDBOX", "SENDGRID_FROM_NAME"];
 
 const valid = {
   name: "Camila Rojas",
@@ -41,8 +43,8 @@ function request(body: unknown, init: { ip?: string; contentType?: string; raw?:
 beforeEach(() => {
   send.mockReset().mockResolvedValue([{ statusCode: 202 }, {}]);
   setApiKey.mockReset();
+  for (const k of CLEARED) vi.stubEnv(k, "");
   for (const [k, v] of Object.entries(ENV)) vi.stubEnv(k, v);
-  vi.stubEnv("SENDGRID_DRY_RUN", "");
   vi.spyOn(console, "error").mockImplementation(() => {});
   vi.spyOn(console, "warn").mockImplementation(() => {});
 });
@@ -60,15 +62,16 @@ describe("POST /api/contact", () => {
     expect(send).toHaveBeenCalledTimes(2);
 
     const [internal] = send.mock.calls[0]!;
-    expect(internal.to).toBe(ENV.ADMIN_EMAIL);
-    expect(internal.from.email).toBe(ENV.SENDGRID_SENDER_EMAIL);
+    expect(internal.to).toBe(ENV.CONTACT_TO_EMAIL);
+    expect(internal.from.email).toBe(ENV.SENDGRID_FROM_EMAIL);
+    expect(internal.mailSettings).toEqual({ sandboxMode: { enable: false } });
     expect(internal.replyTo).toEqual({ email: valid.email, name: valid.name });
     expect(internal.html).toContain(valid.message);
 
     const [confirmation] = send.mock.calls[1]!;
     expect(confirmation.to.email).toBe(valid.email);
-    expect(confirmation.from.email).toBe(ENV.SENDGRID_SENDER_EMAIL);
-    expect(confirmation.replyTo).toBe(ENV.ADMIN_EMAIL);
+    expect(confirmation.from.email).toBe(ENV.SENDGRID_FROM_EMAIL);
+    expect(confirmation.replyTo).toBe(ENV.CONTACT_TO_EMAIL);
     expect(confirmation.html).toContain("Hemos recibido tu mensaje con éxito");
     expect(confirmation.html).toContain("+56958961796");
   });
@@ -110,13 +113,33 @@ describe("POST /api/contact", () => {
     expect(send).not.toHaveBeenCalled();
   });
 
-  it("does not call SendGrid in dry-run mode", async () => {
-    vi.stubEnv("SENDGRID_API_KEY", "");
-    vi.stubEnv("SENDGRID_DRY_RUN", "1");
+  it("development without SendGrid: saves the emails to .mail-outbox instead of sending (like DATASHEQ)", async () => {
+    for (const k of Object.keys(ENV)) vi.stubEnv(k, "");
+    vi.stubEnv("NODE_ENV", "development");
     vi.spyOn(console, "info").mockImplementation(() => {});
     const res = await POST(request(valid));
     expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ ok: true, confirmation: "outbox" });
     expect(send).not.toHaveBeenCalled();
+  });
+
+  it("production without SendGrid: returns 500 (config) and sends nothing", async () => {
+    for (const k of Object.keys(ENV)) vi.stubEnv(k, "");
+    vi.stubEnv("NODE_ENV", "production");
+    const res = await POST(request(valid));
+    expect(res.status).toBe(500);
+    expect(send).not.toHaveBeenCalled();
+  });
+
+  it("SENDGRID_SANDBOX=true and CLIENT_REPLY_TO are applied", async () => {
+    vi.stubEnv("SENDGRID_SANDBOX", "true");
+    vi.stubEnv("CLIENT_REPLY_TO", "atencion@clegal.example");
+    const res = await POST(request(valid));
+    expect(res.status).toBe(200);
+    const [internal] = send.mock.calls[0]!;
+    const [confirmation] = send.mock.calls[1]!;
+    expect(internal.mailSettings).toEqual({ sandboxMode: { enable: true } });
+    expect(confirmation.replyTo).toBe("atencion@clegal.example");
   });
 
   it("rate-limits repeated submissions from the same IP", async () => {
@@ -137,11 +160,11 @@ describe("POST /api/contact", () => {
 });
 
 describe("company inbox variable (Railway)", () => {
-  it("accepts CONTACT_TO_EMAIL / SENDGRID_FROM_EMAIL (DATASHEQ names) when the C-Legal names are unset", async () => {
-    vi.stubEnv("ADMIN_EMAIL", "");
-    vi.stubEnv("SENDGRID_SENDER_EMAIL", "");
-    vi.stubEnv("CONTACT_TO_EMAIL", "ventas@clegal.example");
-    vi.stubEnv("SENDGRID_FROM_EMAIL", "no-reply@clegal.example");
+  it("still accepts the previous names ADMIN_EMAIL / SENDGRID_SENDER_EMAIL", async () => {
+    vi.stubEnv("CONTACT_TO_EMAIL", "");
+    vi.stubEnv("SENDGRID_FROM_EMAIL", "");
+    vi.stubEnv("ADMIN_EMAIL", "ventas@clegal.example");
+    vi.stubEnv("SENDGRID_SENDER_EMAIL", "no-reply@clegal.example");
     const res = await POST(request(valid));
     expect(res.status).toBe(200);
     const [internal] = send.mock.calls[0]!;
@@ -151,8 +174,8 @@ describe("company inbox variable (Railway)", () => {
     expect(confirmation.replyTo).toBe("ventas@clegal.example");
   });
 
-  it("sends the lead to every address in a comma-separated list", async () => {
-    vi.stubEnv("ADMIN_EMAIL", "ventas@clegal.example, gerencia@clegal.example");
+  it("sends the lead to every address in a comma-separated CONTACT_TO_EMAIL", async () => {
+    vi.stubEnv("CONTACT_TO_EMAIL", "ventas@clegal.example, gerencia@clegal.example");
     const res = await POST(request(valid));
     expect(res.status).toBe(200);
     const [internal] = send.mock.calls[0]!;
@@ -161,9 +184,9 @@ describe("company inbox variable (Railway)", () => {
     expect(confirmation.replyTo).toBe("ventas@clegal.example");
   });
 
-  it("returns 500 (config) when no company inbox is set", async () => {
-    vi.stubEnv("ADMIN_EMAIL", "");
+  it("returns 500 (config) when the company inbox is missing", async () => {
     vi.stubEnv("CONTACT_TO_EMAIL", "");
+    vi.stubEnv("ADMIN_EMAIL", "");
     const res = await POST(request(valid));
     expect(res.status).toBe(500);
     expect((await res.json()).error).toBe("config");

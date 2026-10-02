@@ -2,37 +2,40 @@ import "server-only";
 import { z } from "zod";
 
 /**
- * Server-only environment. Validated lazily (on first use) so `next build`
- * does not require secrets; a misconfigured deployment fails loudly on the
- * first contact request and in /api/health instead of silently dropping leads.
+ * Server-only environment — the SAME Railway variables as the DATASHEQ site:
  *
- * Variable names are shared with the DATASHEQ site, so the same Railway
- * variables work for both services:
- *   company inbox  → ADMIN_EMAIL        (alias: CONTACT_TO_EMAIL)  — comma-separated list allowed
- *   sender address → SENDGRID_SENDER_EMAIL (alias: SENDGRID_FROM_EMAIL)
- *   sender name    → SENDGRID_SENDER_NAME  (alias: SENDGRID_FROM_NAME)
+ *   SENDGRID_API_KEY         required  API key with "Mail Send" permission
+ *   SENDGRID_FROM_EMAIL      required  verified sender address
+ *   SENDGRID_FROM_NAME       optional  sender name (default "C-Legal")
+ *   CONTACT_TO_EMAIL         required  company inbox(es) that receive every lead, comma-separated
+ *   CLIENT_REPLY_TO          optional  Reply-To on the client confirmation (default: first CONTACT_TO_EMAIL)
+ *   SENDGRID_SANDBOX         optional  "true" = SendGrid validates but does not deliver
+ *   SENDGRID_DATA_RESIDENCY  optional  "eu" for EU-residency SendGrid subusers
+ *   CONTACT_RATE_LIMIT       optional  successful submissions per IP per 10 min (default 5)
+ *   PUBLIC_BASE_URL          optional  public URL of the site (see lib/site.ts)
+ *
+ * Older names still work as fallbacks: SENDGRID_SENDER_EMAIL, SENDGRID_SENDER_NAME, ADMIN_EMAIL.
+ *
+ * Without SendGrid configured, development (NODE_ENV !== "production") saves the
+ * emails to ./.mail-outbox instead of sending them — exactly like the DATASHEQ site.
  */
 const email = z.string().trim().pipe(z.email("must be a valid email"));
 
-const serverEnvSchema = z
-  .object({
-    SENDGRID_API_KEY: z.string().trim().optional(),
-    SENDGRID_SENDER_EMAIL: email,
-    SENDGRID_SENDER_NAME: z.string().trim().min(1).max(80).default("C-Legal"),
-    // Inbox(es) that receive every new lead. First address is also the Reply-To of the client confirmation.
-    ADMIN_EMAILS: z.array(email).min(1, "is required"),
-    // "1" logs emails instead of sending them (local development / staging).
-    SENDGRID_DRY_RUN: z
-      .enum(["0", "1", "true", "false"])
-      .optional()
-      .transform((v) => v === "1" || v === "true"),
-  })
-  .refine((env) => env.SENDGRID_DRY_RUN || (env.SENDGRID_API_KEY?.length ?? 0) > 0, {
-    path: ["SENDGRID_API_KEY"],
-    message: "is required",
-  });
+const configuredSchema = z.object({
+  SENDGRID_API_KEY: z.string().min(1, "is required"),
+  SENDGRID_FROM_EMAIL: email,
+  SENDGRID_FROM_NAME: z.string().trim().min(1).max(80),
+  CONTACT_TO_EMAILS: z.array(email).min(1, "is required"),
+  CLIENT_REPLY_TO: email,
+});
 
-export type ServerEnv = z.infer<typeof serverEnvSchema>;
+export type MailMode = "sendgrid" | "outbox";
+
+export type ServerEnv = z.infer<typeof configuredSchema> & {
+  mode: MailMode;
+  SENDGRID_SANDBOX: boolean;
+  SENDGRID_DATA_RESIDENCY: "eu" | "global";
+};
 
 export class EnvError extends Error {
   constructor(public readonly issues: string[]) {
@@ -42,36 +45,69 @@ export class EnvError extends Error {
 }
 
 /** First non-empty value among the given variable names. */
-function pick(source: NodeJS.ProcessEnv, ...names: string[]): string | undefined {
+function pick(source: NodeJS.ProcessEnv, ...names: string[]): string {
   for (const name of names) {
     const value = source[name]?.trim();
     if (value) return value;
   }
-  return undefined;
+  return "";
 }
 
-function list(value: string | undefined): string[] {
-  return (value ?? "")
+function list(value: string): string[] {
+  return value
     .split(/[,;]/)
     .map((s) => s.trim())
     .filter(Boolean);
 }
 
+const LABELS: Record<string, string> = {
+  SENDGRID_API_KEY: "SENDGRID_API_KEY",
+  SENDGRID_FROM_EMAIL: "SENDGRID_FROM_EMAIL",
+  SENDGRID_FROM_NAME: "SENDGRID_FROM_NAME",
+  CONTACT_TO_EMAILS: "CONTACT_TO_EMAIL",
+  CLIENT_REPLY_TO: "CLIENT_REPLY_TO",
+};
+
 export function getServerEnv(source: NodeJS.ProcessEnv = process.env): ServerEnv {
-  const parsed = serverEnvSchema.safeParse({
+  const to = list(pick(source, "CONTACT_TO_EMAIL", "ADMIN_EMAIL"));
+  const raw = {
     SENDGRID_API_KEY: pick(source, "SENDGRID_API_KEY"),
-    SENDGRID_SENDER_EMAIL: pick(source, "SENDGRID_SENDER_EMAIL", "SENDGRID_FROM_EMAIL"),
-    SENDGRID_SENDER_NAME: pick(source, "SENDGRID_SENDER_NAME", "SENDGRID_FROM_NAME"),
-    ADMIN_EMAILS: list(pick(source, "ADMIN_EMAIL", "CONTACT_TO_EMAIL")),
-    SENDGRID_DRY_RUN: pick(source, "SENDGRID_DRY_RUN"),
-  });
+    SENDGRID_FROM_EMAIL: pick(source, "SENDGRID_FROM_EMAIL", "SENDGRID_SENDER_EMAIL"),
+    SENDGRID_FROM_NAME: pick(source, "SENDGRID_FROM_NAME", "SENDGRID_SENDER_NAME") || "C-Legal",
+    CONTACT_TO_EMAILS: to,
+    CLIENT_REPLY_TO: pick(source, "CLIENT_REPLY_TO") || to[0] || "",
+  };
+  const extras = {
+    SENDGRID_SANDBOX: pick(source, "SENDGRID_SANDBOX").toLowerCase() === "true",
+    SENDGRID_DATA_RESIDENCY: (pick(source, "SENDGRID_DATA_RESIDENCY").toLowerCase() === "eu" ? "eu" : "global") as
+      | "eu"
+      | "global",
+  };
+
+  // Development without SendGrid: write emails to ./.mail-outbox (same as DATASHEQ).
+  const nothingSet = !raw.SENDGRID_API_KEY && !raw.SENDGRID_FROM_EMAIL && to.length === 0;
+  if (nothingSet && source.NODE_ENV !== "production") {
+    return {
+      ...raw,
+      SENDGRID_FROM_EMAIL: "no-reply@localhost.test",
+      CONTACT_TO_EMAILS: ["leads@localhost.test"],
+      CLIENT_REPLY_TO: "leads@localhost.test",
+      ...extras,
+      mode: "outbox",
+    };
+  }
+
+  const parsed = configuredSchema.safeParse(raw);
   if (!parsed.success) {
     throw new EnvError(
-      parsed.error.issues.map((i) => {
-        const key = i.path[0] === "ADMIN_EMAILS" ? "ADMIN_EMAIL (or CONTACT_TO_EMAIL)" : i.path.join(".") || "env";
-        return `${key} ${i.message}`;
-      }),
+      parsed.error.issues.map((i) => `${LABELS[String(i.path[0])] ?? i.path.join(".")} ${i.message}`),
     );
   }
-  return parsed.data;
+  return { ...parsed.data, ...extras, mode: "sendgrid" };
+}
+
+/** Successful submissions allowed per IP every 10 minutes (CONTACT_RATE_LIMIT, default 5). */
+export function contactRateLimit(source: NodeJS.ProcessEnv = process.env): number {
+  const n = Number.parseInt(pick(source, "CONTACT_RATE_LIMIT"), 10);
+  return Number.isFinite(n) && n > 0 ? n : 5;
 }
