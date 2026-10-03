@@ -79,7 +79,7 @@ export function Header({ nav, whatsappPrefill, lang, loginUrl }: Props) {
           <ul className="flex items-center gap-7 xl:gap-9">
             {links.map((l) => (
               <li key={l.href}>
-                <a href={l.href} className="text-[0.95rem] font-medium text-ink transition-colors hover:text-green-strong">
+                <a href={l.href} className="text-[0.95rem] font-medium text-ink transition-colors hover:text-purple">
                   {l.label}
                 </a>
               </li>
@@ -139,7 +139,7 @@ export function Header({ nav, whatsappPrefill, lang, loginUrl }: Props) {
             ))}
           </ul>
           <div className="mt-5 flex flex-col gap-3">
-            <ContactTrigger onOpen={close} className="btn btn-primary h-12 w-full text-base">
+            <ContactTrigger onOpen={close} className="btn btn-outline h-12 w-full text-base">
               {nav.contact}
             </ContactTrigger>
             {loginUrl ? (

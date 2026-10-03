@@ -46,9 +46,10 @@ describe("buildConfirmationEmail", () => {
     expect(email.text).not.toContain("Segunda línea");
   });
 
-  it("uses inline styles with palette colours only", () => {
+  it("uses inline styles with palette colours, purple as the primary accent", () => {
     const hexes = new Set(email.html.match(/#[0-9a-f]{6}\b/gi)?.map((h) => h.toLowerCase()));
-    for (const brand of [palette.ink, palette.green, palette.white]) expect(hexes.has(brand)).toBe(true);
+    for (const brand of [palette.ink, palette.purple, palette.white]) expect(hexes.has(brand)).toBe(true);
+    expect(hexes.has(palette.green)).toBe(false);
     expect(email.html).toContain("https://clegal.example/brand/clegal-mark-email.png");
   });
 });

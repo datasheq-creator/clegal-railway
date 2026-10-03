@@ -15,7 +15,7 @@ export function Footer({ t, nav, whatsappPrefill }: { t: Dictionary["footer"]; n
         </div>
 
         <nav aria-label={t.navTitle}>
-          <h2 className="text-xs font-extrabold tracking-[0.14em] text-green uppercase">{t.navTitle}</h2>
+          <h2 className="text-xs font-extrabold tracking-[0.14em] text-purple uppercase">{t.navTitle}</h2>
           <ul className="mt-4 space-y-2.5 text-[0.95rem]">
             <li>
               <a href="#inicio" className="text-line hover:text-white">
@@ -41,11 +41,11 @@ export function Footer({ t, nav, whatsappPrefill }: { t: Dictionary["footer"]; n
         </nav>
 
         <div>
-          <h2 className="text-xs font-extrabold tracking-[0.14em] text-green uppercase">{t.contactTitle}</h2>
+          <h2 className="text-xs font-extrabold tracking-[0.14em] text-purple uppercase">{t.contactTitle}</h2>
           <ul className="mt-4 space-y-3 text-[0.95rem]">
             <li>
               <a href={PHONE_TEL_HREF} className="inline-flex items-center gap-2.5 text-line hover:text-white">
-                <PhoneIcon size={18} className="text-green" />
+                <PhoneIcon size={18} className="text-purple" />
                 <span>
                   <span className="sr-only">{t.phone}: </span>
                   {PHONE_DISPLAY}
@@ -59,13 +59,13 @@ export function Footer({ t, nav, whatsappPrefill }: { t: Dictionary["footer"]; n
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2.5 text-line hover:text-white"
               >
-                <ChatIcon size={18} className="text-green" />
+                <ChatIcon size={18} className="text-purple" />
                 {t.whatsapp}
               </a>
             </li>
             <li>
               <ContactTrigger className="inline-flex cursor-pointer items-center gap-2.5 text-line hover:text-white">
-                <MailIcon size={18} className="text-green" />
+                <MailIcon size={18} className="text-purple" />
                 {nav.contact}
               </ContactTrigger>
             </li>

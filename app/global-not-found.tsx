@@ -24,7 +24,7 @@ export default function GlobalNotFound() {
     <html lang="es-CL" className={inter.variable}>
       <body className="flex min-h-dvh items-center justify-center bg-white px-6 font-sans text-ink">
         <main className="max-w-md text-center">
-          <p className="text-sm font-extrabold tracking-[0.18em] text-green uppercase">404</p>
+          <p className="text-sm font-extrabold tracking-[0.18em] text-purple uppercase">404</p>
           <h1 className="mt-3 text-3xl font-extrabold tracking-tight">{t.title}</h1>
           <p className="mt-3 text-ink-muted">{t.text}</p>
           <a href="/" className="btn btn-primary mt-8 h-12 px-6">

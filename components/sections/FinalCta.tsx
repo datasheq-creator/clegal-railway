@@ -12,7 +12,7 @@ export function FinalCta({ t }: { t: Dictionary["finalCta"] }) {
       <div className="container-page flex flex-col items-center text-center">
         <h2 id="cta-title" className="text-[clamp(1.75rem,1.2rem+2.4vw,3rem)] leading-[1.08] font-extrabold tracking-[-0.02em]">
           <span className="block text-ink">{t.title}</span>
-          <span className="block text-green">{t.highlight}</span>
+          <span className="block text-purple">{t.highlight}</span>
         </h2>
         <p className="mt-6 max-w-2xl text-[clamp(1.05rem,0.95rem+0.4vw,1.3rem)] leading-snug font-semibold text-ink-muted">
           {t.subtitleLines.map((line) => (
@@ -28,7 +28,7 @@ export function FinalCta({ t }: { t: Dictionary["finalCta"] }) {
         <div className="mt-10 flex flex-col items-center gap-3 text-[1.05rem] text-ink-muted sm:flex-row sm:text-[1.15rem]">
           <span className="inline-flex items-center gap-2">
             {t.ecosystem}
-            <ArrowRightIcon size={20} strokeWidth={2.5} className="hidden text-green sm:block" />
+            <ArrowRightIcon size={20} strokeWidth={2.5} className="hidden text-purple sm:block" />
           </span>
           {links.datasheq ? (
             <a href={links.datasheq} target="_blank" rel="noopener" className={ecosystemClass}>

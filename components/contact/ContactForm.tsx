@@ -151,7 +151,7 @@ export function ContactForm({
   if (status === "success") {
     return (
       <div className="flex flex-col items-center py-6 text-center" role="status">
-        <span className="flex size-16 items-center justify-center rounded-full bg-green-soft text-green">
+        <span className="flex size-16 items-center justify-center rounded-full bg-purple-soft text-purple">
           <CheckCircleIcon size={34} />
         </span>
         <h3 ref={successRef} tabIndex={-1} className="mt-5 text-xl font-extrabold outline-none">
@@ -170,13 +170,13 @@ export function ContactForm({
     "mt-1.5 block w-full rounded-lg border bg-white px-3.5 py-3 text-[0.95rem] text-ink placeholder:text-ink-faint transition-colors focus:outline-none focus-visible:outline-none focus:ring-2";
   const inputState = (f: ContactField) =>
     visibleError(f)
-      ? "border-danger focus:border-danger focus:ring-purple-soft"
-      : "border-line focus:border-blue focus:ring-blue/15";
+      ? "border-danger focus:border-danger focus:ring-danger-soft"
+      : "border-line focus:border-purple focus:ring-purple/15";
 
   const label = (f: ContactField) => (
     <label htmlFor={fieldId(f)} className="text-sm font-semibold text-ink">
       {dict.fields[f].label}
-      <span className="text-danger" aria-hidden="true">
+      <span className="text-purple" aria-hidden="true">
         {" "}
         *
       </span>
@@ -204,7 +204,7 @@ export function ContactForm({
   return (
     <form ref={formRef} onSubmit={onSubmit} noValidate aria-busy={submitting} className="grid gap-4">
       {formError ? (
-        <div role="alert" className="flex items-start gap-2.5 rounded-lg bg-purple-soft px-4 py-3 text-sm text-danger">
+        <div role="alert" className="flex items-start gap-2.5 rounded-lg bg-danger-soft px-4 py-3 text-sm text-danger">
           <AlertIcon size={18} className="mt-px shrink-0" />
           <span>{formError}</span>
         </div>
@@ -344,7 +344,7 @@ export function ContactForm({
 
       <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-line pt-4 text-sm text-ink-muted">
         <span>{dict.orCall}</span>
-        <a href={PHONE_TEL_HREF} className="inline-flex items-center gap-1.5 font-semibold text-ink hover:text-blue">
+        <a href={PHONE_TEL_HREF} className="inline-flex items-center gap-1.5 font-semibold text-ink hover:text-purple">
           <PhoneIcon size={16} />
           {PHONE_DISPLAY}
         </a>
@@ -352,7 +352,7 @@ export function ContactForm({
           href={whatsappHref()}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 font-semibold text-ink hover:text-blue"
+          className="inline-flex items-center gap-1.5 font-semibold text-ink hover:text-purple"
         >
           <ChatIcon size={16} />
           WhatsApp

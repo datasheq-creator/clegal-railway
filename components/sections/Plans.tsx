@@ -7,7 +7,7 @@ export function Plans({ t }: { t: Dictionary["plans"] }) {
     <section id="planes" aria-labelledby="planes-title" className="bg-white pt-8 pb-24 md:pb-32">
       <div className="container-page">
         <header className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-extrabold tracking-[0.18em] text-green uppercase">{t.eyebrow}</p>
+          <p className="text-xs font-extrabold tracking-[0.18em] text-purple uppercase">{t.eyebrow}</p>
           <h2 id="planes-title" className="mt-4 text-[clamp(1.75rem,1.3rem+1.6vw,2.4rem)] leading-[1.12] font-extrabold tracking-[-0.015em]">
             {t.titleLines.map((line) => (
               <span key={line} className="block">
@@ -30,12 +30,12 @@ export function Plans({ t }: { t: Dictionary["plans"] }) {
                   recommended
                     ? "border border-line shadow-glow"
                     : outlined
-                      ? "border-[1.5px] border-green shadow-card"
+                      ? "border-[1.5px] border-purple shadow-card"
                       : "border border-line shadow-card"
                 } ${recommended ? "mt-4 md:mt-0" : ""}`}
               >
                 {recommended ? (
-                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-green px-5 py-1.5 text-xs font-semibold whitespace-nowrap text-on-green">
+                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-purple px-5 py-1.5 text-xs font-semibold whitespace-nowrap text-white">
                     {t.recommended}
                   </span>
                 ) : null}
@@ -69,7 +69,7 @@ export function Plans({ t }: { t: Dictionary["plans"] }) {
                       }`}
                     >
                       {f.included ? (
-                        <CheckIcon size={16} strokeWidth={3} className="shrink-0 text-green" />
+                        <CheckIcon size={16} strokeWidth={3} className="shrink-0 text-purple" />
                       ) : (
                         <MinusIcon size={16} strokeWidth={2} className="shrink-0 text-ink-faint" />
                       )}

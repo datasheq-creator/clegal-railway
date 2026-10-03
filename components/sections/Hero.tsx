@@ -9,7 +9,7 @@ export function Hero({ t }: { t: Dictionary["hero"] }) {
         <div className="max-w-[38rem] lg:pb-12">
           <h1 id="hero-title" className="text-[clamp(2.25rem,1.2rem+2.4vw,2.75rem)] leading-[1.05] font-extrabold tracking-[-0.02em]">
             <span className="block text-ink">{t.title}</span>
-            <span className="block text-green xl:whitespace-nowrap">{t.highlight}</span>
+            <span className="block text-purple xl:whitespace-nowrap">{t.highlight}</span>
           </h1>
           <p className="mt-5 max-w-[34rem] text-[clamp(1.125rem,1rem+0.5vw,1.4rem)] leading-snug font-medium text-ink-muted">
             {t.subtitle}

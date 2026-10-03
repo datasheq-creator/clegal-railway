@@ -75,7 +75,7 @@ function layout({ preheader, body, lang = "es" }: { preheader: string; body: str
     .h1 { font-size: 22px !important; line-height: 28px !important; }
     .banner { font-size: 17px !important; line-height: 24px !important; }
   }
-  a { color: ${palette.blue}; }
+  a { color: ${tints.purpleStrong}; }
 </style>
 </head>
 <body style="margin:0;padding:0;background-color:${tints.surface};-webkit-text-size-adjust:100%;">
@@ -97,7 +97,7 @@ function brandHeader(siteUrl: string | null): string {
   const logo = logoUrl(siteUrl);
   const mark = logo
     ? `<img src="${logo}" width="40" height="35" alt="" style="display:inline-block;vertical-align:middle;border:0;outline:none;width:40px;height:auto;margin-right:10px;">`
-    : `<span style="display:inline-block;vertical-align:middle;width:12px;height:12px;border-radius:6px;background-color:${palette.green};margin-right:10px;"></span>`;
+    : `<span style="display:inline-block;vertical-align:middle;width:12px;height:12px;border-radius:6px;background-color:${palette.purple};margin-right:10px;"></span>`;
   return `<tr>
   <td class="px" style="padding:24px 32px 18px 32px;font-family:${FONT};">
     ${mark}<span style="display:inline-block;vertical-align:middle;font-size:22px;line-height:24px;font-weight:800;letter-spacing:0.5px;color:${palette.ink};">C-LEGAL</span>
@@ -134,7 +134,7 @@ export function buildConfirmationEmail(lead: ContactPayload, meta: LeadMeta): Re
   for (let i = 0; i < MODULES.length; i += 2) {
     const cell = (label: string | undefined) =>
       label
-        ? `<td class="col" width="50%" style="width:50%;padding:6px 0;font-family:${FONT};font-size:14px;line-height:20px;color:${palette.ink};"><span style="color:${palette.green};font-weight:800;">&#10003;</span>&nbsp;&nbsp;${escapeHtml(label)}</td>`
+        ? `<td class="col" width="50%" style="width:50%;padding:6px 0;font-family:${FONT};font-size:14px;line-height:20px;color:${palette.ink};"><span style="color:${palette.purple};font-weight:800;">&#10003;</span>&nbsp;&nbsp;${escapeHtml(label)}</td>`
         : `<td class="col" width="50%" style="width:50%;"></td>`;
     moduleRows.push(`<tr>${cell(MODULES[i])}${cell(MODULES[i + 1])}</tr>`);
   }
@@ -146,7 +146,7 @@ export function buildConfirmationEmail(lead: ContactPayload, meta: LeadMeta): Re
         ? `<td class="col col-gap" width="50%" valign="top" style="width:50%;padding:0 ${side === "l" ? "8px" : "0"} 12px ${side === "r" ? "8px" : "0"};">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${tints.surface};border-radius:10px;">
               <tr><td style="padding:14px 16px;font-family:${FONT};">
-                <div style="font-size:14px;line-height:20px;font-weight:700;color:${palette.ink};"><span style="display:inline-block;width:8px;height:8px;border-radius:4px;background-color:${palette.green};margin-right:8px;vertical-align:middle;"></span>${escapeHtml(item[0])}</div>
+                <div style="font-size:14px;line-height:20px;font-weight:700;color:${palette.ink};"><span style="display:inline-block;width:8px;height:8px;border-radius:4px;background-color:${palette.purple};margin-right:8px;vertical-align:middle;"></span>${escapeHtml(item[0])}</div>
                 <div style="font-size:13px;line-height:19px;color:${tints.inkMuted};padding-top:4px;">${escapeHtml(item[1])}</div>
               </td></tr>
             </table>
@@ -166,12 +166,12 @@ export function buildConfirmationEmail(lead: ContactPayload, meta: LeadMeta): Re
   const body = `${brandHeader(meta.siteUrl)}
 <tr>
   <td class="px" style="padding:0 32px;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${palette.green};border-radius:12px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${tints.purpleSoft};border:1px solid ${tints.purpleBorder};border-radius:12px;">
       <tr>
         <td style="padding:20px 22px;font-family:${FONT};">
           <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
             <td valign="top" style="padding-right:14px;">
-              <div style="width:34px;height:34px;border-radius:17px;background-color:${palette.white};text-align:center;font-size:20px;line-height:34px;font-weight:800;color:${palette.green};">&#10003;</div>
+              <div style="width:34px;height:34px;border-radius:17px;background-color:${palette.purple};text-align:center;font-size:20px;line-height:34px;font-weight:800;color:${palette.white};">&#10003;</div>
             </td>
             <td valign="middle" class="banner" style="font-size:19px;line-height:26px;font-weight:800;color:${palette.ink};">${escapeHtml(CONFIRMATION_NOTICE)}</td>
           </tr></table>
@@ -188,7 +188,7 @@ export function buildConfirmationEmail(lead: ContactPayload, meta: LeadMeta): Re
 </tr>
 <tr>
   <td class="px" style="padding:28px 32px 0 32px;font-family:${FONT};">
-    <div style="font-size:11px;line-height:16px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:${palette.green};">Sobre C-Legal</div>
+    <div style="font-size:11px;line-height:16px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:${tints.purpleStrong};">Sobre C-Legal</div>
     <div class="h1" style="font-size:24px;line-height:30px;font-weight:800;color:${palette.ink};padding-top:6px;">Gestión Legal Inteligente</div>
     <p style="margin:8px 0 0 0;font-size:15px;line-height:23px;color:${tints.inkMuted};">Gestiona y controla el cumplimiento legal con IA, automatización y analítica avanzada. Parte del ecosistema Datasheq de digitalización HSEQ.</p>
   </td>
@@ -227,7 +227,7 @@ export function buildConfirmationEmail(lead: ContactPayload, meta: LeadMeta): Re
             </tr>
             <tr>
               <td>
-                <a href="${wa}" style="display:inline-block;background-color:${palette.green};color:${palette.ink};font-size:15px;line-height:20px;font-weight:800;text-decoration:none;padding:12px 22px;border-radius:8px;">Escríbenos por WhatsApp</a>
+                <a href="${wa}" style="display:inline-block;background-color:${palette.purple};color:${palette.white};font-size:15px;line-height:20px;font-weight:800;text-decoration:none;padding:12px 22px;border-radius:8px;">Escríbenos por WhatsApp</a>
                 <a href="${PHONE_TEL_HREF}" style="display:inline-block;color:${palette.white};font-size:15px;line-height:20px;font-weight:700;text-decoration:none;padding:12px 16px;">Llamar al ${PHONE_DISPLAY}</a>
               </td>
             </tr>
@@ -293,7 +293,7 @@ export function buildInternalEmail(lead: ContactPayload, meta: LeadMeta): Render
   const body = `${brandHeader(meta.siteUrl)}
 <tr>
   <td class="px" style="padding:0 32px 4px 32px;font-family:${FONT};">
-    <div style="display:inline-block;background-color:${tints.purpleSoft};color:${palette.purple};font-size:11px;line-height:16px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;padding:4px 10px;border-radius:999px;">Nuevo lead</div>
+    <div style="display:inline-block;background-color:${tints.purpleSoft};color:${tints.purpleStrong};font-size:11px;line-height:16px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;padding:4px 10px;border-radius:999px;">Nuevo lead</div>
     <div class="h1" style="font-size:22px;line-height:29px;font-weight:800;color:${palette.ink};padding-top:10px;">${escapeHtml(lead.name)} — ${escapeHtml(serviceLabel)}</div>
   </td>
 </tr>
@@ -302,8 +302,8 @@ export function buildInternalEmail(lead: ContactPayload, meta: LeadMeta): Render
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       ${row("Recibido", `${escapeHtml(santiago)}<br><span style="color:${tints.inkSubtle};font-size:12px;">${iso} (UTC)</span>`)}
       ${row("Nombre", escapeHtml(lead.name))}
-      ${row("Email", `<a href="mailto:${escapeHtml(lead.email)}" style="color:${palette.blue};">${escapeHtml(lead.email)}</a>`)}
-      ${row("Teléfono", `<a href="tel:${escapeHtml(phoneDigits)}" style="color:${palette.blue};">${escapeHtml(lead.phone)}</a> &nbsp;·&nbsp; <a href="${escapeHtml(waLead)}" style="color:${palette.blue};">WhatsApp</a>`)}
+      ${row("Email", `<a href="mailto:${escapeHtml(lead.email)}" style="color:${tints.purpleStrong};">${escapeHtml(lead.email)}</a>`)}
+      ${row("Teléfono", `<a href="tel:${escapeHtml(phoneDigits)}" style="color:${tints.purpleStrong};">${escapeHtml(lead.phone)}</a> &nbsp;·&nbsp; <a href="${escapeHtml(waLead)}" style="color:${tints.purpleStrong};">WhatsApp</a>`)}
       ${row("Asunto / Servicio", escapeHtml(serviceLabel))}
       ${row("Idioma del sitio", lead.lang === "en" ? "Inglés" : "Español")}
     </table>
@@ -312,7 +312,7 @@ export function buildInternalEmail(lead: ContactPayload, meta: LeadMeta): Render
 <tr>
   <td class="px" style="padding:16px 32px 0 32px;font-family:${FONT};">
     <div style="font-size:13px;line-height:20px;font-weight:700;color:${tints.inkMuted};padding-bottom:6px;">Mensaje</div>
-    <div style="background-color:${tints.surface};border-left:3px solid ${palette.green};border-radius:6px;padding:14px 16px;font-size:14px;line-height:22px;color:${palette.ink};white-space:pre-wrap;word-break:break-word;">${escapeHtml(lead.message)}</div>
+    <div style="background-color:${tints.surface};border-left:3px solid ${palette.purple};border-radius:6px;padding:14px 16px;font-size:14px;line-height:22px;color:${palette.ink};white-space:pre-wrap;word-break:break-word;">${escapeHtml(lead.message)}</div>
   </td>
 </tr>
 <tr>

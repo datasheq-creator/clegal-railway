@@ -1,5 +1,7 @@
 /**
  * Brand palette — single source of truth (Images Clegal/PALETA-COLORES.png).
+ * Primary colour: purple (#c200ff), same as the DATASHEQ site. Ink, blue and
+ * green are secondary (green is kept for WhatsApp).
  *
  * The web UI consumes these through the CSS custom properties declared in
  * app/globals.css (`@theme`). Email clients do not support CSS variables or
@@ -12,6 +14,8 @@ export const palette = {
   purple: "#c200ff",
   green: "#04dd75",
   white: "#ffffff",
+  /** Errors only (not a brand colour). Same red as the DATASHEQ site. */
+  danger: "#c62828",
 } as const;
 
 function hexToRgb(hex: string): [number, number, number] {
@@ -36,6 +40,9 @@ export const tints = {
   inkSubtle: mix(palette.ink, palette.white, 0.55),
   line: mix(palette.ink, palette.white, 0.12),
   surface: mix(palette.ink, palette.white, 0.04),
-  greenSoft: mix(palette.green, palette.white, 0.12),
   purpleSoft: mix(palette.purple, palette.white, 0.1),
+  /** Purple tint for borders on purple-soft backgrounds. */
+  purpleBorder: mix(palette.purple, palette.white, 0.28),
+  /** Deeper purple for small text/links on white (WCAG AA, 5.6:1). Mirrors --color-purple-strong. */
+  purpleStrong: mix(palette.purple, palette.ink, 0.85),
 } as const;

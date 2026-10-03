@@ -15,7 +15,7 @@ const VALUE_ICONS: Record<ValueIcon, typeof RobotIcon> = {
 function CardHeading({ number, title, id }: { number: string; title: string; id: string }) {
   return (
     <>
-      <p className="text-lg font-extrabold text-green" aria-hidden="true">
+      <p className="text-lg font-extrabold text-purple" aria-hidden="true">
         {number}
       </p>
       <h3 id={id} className="mt-3 text-[1.35rem] leading-[1.15] font-extrabold tracking-[-0.01em] text-ink">
@@ -25,7 +25,7 @@ function CardHeading({ number, title, id }: { number: string; title: string; id:
   );
 }
 
-const card = "relative flex flex-col rounded-[1.25rem] border-[1.5px] border-green bg-white px-7 pt-9 sm:px-9";
+const card = "relative flex flex-col rounded-[1.25rem] border-[1.5px] border-purple bg-white px-7 pt-9 sm:px-9";
 
 export function Solution({ t }: { t: Dictionary["solution"] }) {
   const { problem, platform, value } = t;
@@ -64,7 +64,7 @@ export function Solution({ t }: { t: Dictionary["solution"] }) {
           <ul className="mt-8 space-y-3.5 text-[0.95rem] text-ink-muted">
             {platform.items.map((item) => (
               <li key={item} className="flex items-center gap-4">
-                <CheckIcon size={26} strokeWidth={3.25} className="shrink-0 text-green" />
+                <CheckIcon size={26} strokeWidth={3.25} className="shrink-0 text-purple" />
                 <span>{item}</span>
               </li>
             ))}
@@ -87,7 +87,7 @@ export function Solution({ t }: { t: Dictionary["solution"] }) {
               const Icon = VALUE_ICONS[icon];
               return (
                 <li key={title} className="flex gap-5">
-                  <Icon size={42} strokeWidth={1.6} className="shrink-0 text-green" />
+                  <Icon size={42} strokeWidth={1.6} className="shrink-0 text-purple" />
                   <div className="text-[0.95rem] leading-relaxed">
                     <p className="font-semibold text-ink">{title}</p>
                     <p className="text-ink-muted">{text}</p>
