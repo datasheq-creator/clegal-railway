@@ -16,12 +16,9 @@ function Block({ title, paragraphs }: { title: string; paragraphs: string[] }) {
 
 type Member = Dictionary["about"]["team"]["members"][number];
 
-/** 3 + 2 layout from the Nosotros mockup; 2 + 2 + 1 on phones. */
-const memberPlacement = ["", "", "", "sm:col-start-2", "col-span-2"];
-
-function TeamMember({ m, index }: { m: Member; index: number }) {
+function TeamMember({ m }: { m: Member }) {
   return (
-    <li className={`flex flex-col items-center text-center sm:col-span-2 ${memberPlacement[index] ?? ""}`}>
+    <li className="flex flex-col items-center text-center">
       <Image
         src={m.photo}
         alt={m.name}
@@ -51,9 +48,9 @@ export function About({ t }: { t: Dictionary["about"] }) {
           </div>
         </div>
 
-        <ul className="mx-auto grid w-full max-w-[38rem] grid-cols-2 gap-x-4 gap-y-9 sm:grid-cols-6 sm:gap-x-5">
-          {t.team.members.map((m, i) => (
-            <TeamMember key={m.name} m={m} index={i} />
+        <ul className="mx-auto grid w-full max-w-[38rem] grid-cols-2 gap-x-4 gap-y-9 sm:gap-x-5">
+          {t.team.members.map((m) => (
+            <TeamMember key={m.name} m={m} />
           ))}
         </ul>
       </div>

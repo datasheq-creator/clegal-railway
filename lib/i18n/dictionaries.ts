@@ -204,10 +204,9 @@ const es = {
     team: {
       title: "Equipo",
       paragraphs: [
-        "C-Legal es un equipo multidisciplinario de 5 personas que integra conocimiento técnico, de negocios y tecnología para desarrollar herramientas digitales simples, eficientes e intuitivas que faciliten la gestión HSEQ (seguridad, salud ocupacional, medio ambiente y cumplimiento), el control y la toma de decisiones.",
+        "C-Legal es un equipo multidisciplinario de 4 personas que integra conocimiento técnico, de negocios y tecnología para desarrollar herramientas digitales simples, eficientes e intuitivas que faciliten la gestión HSEQ (seguridad, salud ocupacional, medio ambiente y cumplimiento), el control y la toma de decisiones.",
       ],
       members: [
-        { name: "Tamara Bravo", role: "Founder & CEO", photo: "/team/tamara-bravo.jpg" },
         { name: "Constanza Lores", role: "Control de Gestión", photo: "/team/constanza-lores.jpg" },
         { name: "Victor Achurra", role: "Comercial & Tech", photo: "/team/victor-achurra.jpg" },
         { name: "Paulina Espinoza", role: "Finanzas & RRHH", photo: "/team/paulina-espinoza.jpg" },
@@ -465,10 +464,9 @@ const en: Dictionary = {
     team: {
       title: "Team",
       paragraphs: [
-        "C-Legal is a multidisciplinary team of 5 people combining technical, business and technology expertise to build simple, efficient and intuitive digital tools that support HSEQ management (safety, occupational health, environment and compliance), control and decision-making.",
+        "C-Legal is a multidisciplinary team of 4 people combining technical, business and technology expertise to build simple, efficient and intuitive digital tools that support HSEQ management (safety, occupational health, environment and compliance), control and decision-making.",
       ],
       members: [
-        { name: "Tamara Bravo", role: "Founder & CEO", photo: "/team/tamara-bravo.jpg" },
         { name: "Constanza Lores", role: "Management Control", photo: "/team/constanza-lores.jpg" },
         { name: "Victor Achurra", role: "Sales & Tech", photo: "/team/victor-achurra.jpg" },
         { name: "Paulina Espinoza", role: "Finance & HR", photo: "/team/paulina-espinoza.jpg" },
