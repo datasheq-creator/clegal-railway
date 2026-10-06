@@ -115,8 +115,8 @@ const PILLARS: Array<[string, string]> = [
   ["Prevención", "Identifica brechas y actúa antes de que se conviertan en problemas."],
 ];
 const PLANS: Array<[string, string]> = [
-  ["Libre", "$0 / 30 días"],
-  ["Básico", "$29.990 – $39.990"],
+  ["Libre", "US$0 / 30 días"],
+  ["Básico", "US$39"],
   ["Profesional", "Próximamente"],
   ["Empresa", "Próximamente"],
 ];

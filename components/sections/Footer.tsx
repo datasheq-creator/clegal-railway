@@ -8,8 +8,8 @@ export function Footer({ t, nav, whatsappPrefill }: { t: Dictionary["footer"]; n
   const year = new Date().getFullYear();
   return (
     <footer className="bg-ink text-white">
-      <div className="container-page grid gap-12 py-14 md:grid-cols-[1.4fr_1fr_1fr] md:py-16">
-        <div>
+      <div className="container-page grid gap-12 py-14 text-center md:grid-cols-[1.4fr_1fr_1fr] md:py-16 md:text-left">
+        <div className="flex flex-col items-center md:items-start">
           <Logo variant="inline" />
           <p className="mt-4 max-w-xs text-sm text-ink-faint">{t.tagline}</p>
         </div>
@@ -73,7 +73,7 @@ export function Footer({ t, nav, whatsappPrefill }: { t: Dictionary["footer"]; n
         </div>
       </div>
       <div className="border-t border-white/10">
-        <div className="container-page flex flex-col gap-2 py-6 text-xs text-ink-faint sm:flex-row sm:justify-between">
+        <div className="container-page flex flex-col items-center gap-2 py-6 text-center text-xs text-ink-faint sm:flex-row sm:justify-between sm:text-left">
           <p>
             © {year} C-Legal. {t.rights}
           </p>

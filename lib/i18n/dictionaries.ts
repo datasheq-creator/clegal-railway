@@ -97,13 +97,13 @@ const es = {
     subtitle: "Funcionalidades robustas a precios competitivos. Empieza gratis.",
     recommended: "Recomendado",
     comingSoon: "próximamente",
-    currencyNote: "Precios en pesos chilenos (CLP).",
+    currencyNote: "Precios en dólares estadounidenses (USD).",
     notIncluded: "No incluido",
     items: ([
       {
         id: "libre",
         name: "Libre",
-        price: "$0",
+        price: "US$0",
         period: "/ 30 días",
         features: [
           { label: "App móvil", included: true },
@@ -120,10 +120,10 @@ const es = {
       {
         id: "basico",
         name: "Básico",
-        price: "$29.990 - $39.990",
+        price: "US$39",
         features: [
           { label: "App móvil", included: true },
-          { label: "2 usuarios", included: true },
+          { label: "1 usuario", included: true },
           { label: "1 empresa / 1 instalación", included: true },
           { label: "Verificaciones ilimitadas", included: true },
           { label: "Informes ilimitados", included: true },
@@ -180,11 +180,8 @@ const es = {
     body: "Todo el poder de C-Legal en tus manos. Descarga nuestra app y transforma la forma de gestionar HSEQ: más simple, más inteligente y desde cualquier lugar.",
     access: "Para acceder a nuestra app:",
     chooseStore: "Elige tu store",
-    scan: "Escanea",
     appStore: "Descargar en App Store",
     googlePlay: "Disponible en Google Play",
-    qrAppStore: "Código QR para App Store",
-    qrGooglePlay: "Código QR para Google Play",
     requestAccess: "Solicitar acceso",
     imageAlt: "Smartphone con la pantalla de inicio de la app Datasheq y los módulos C-Legal y C-Controla.",
   },
@@ -361,13 +358,13 @@ const en: Dictionary = {
     subtitle: "Robust features at competitive prices. Start for free.",
     recommended: "Recommended",
     comingSoon: "coming soon",
-    currencyNote: "Prices in Chilean pesos (CLP).",
+    currencyNote: "Prices in US dollars (USD).",
     notIncluded: "Not included",
     items: [
       {
         id: "libre",
         name: "Free",
-        price: "$0",
+        price: "US$0",
         period: "/ 30 days",
         features: [
           { label: "Mobile app", included: true },
@@ -384,10 +381,10 @@ const en: Dictionary = {
       {
         id: "basico",
         name: "Basic",
-        price: "$29.990 - $39.990",
+        price: "US$39",
         features: [
           { label: "Mobile app", included: true },
-          { label: "2 users", included: true },
+          { label: "1 user", included: true },
           { label: "1 company / 1 site", included: true },
           { label: "Unlimited verifications", included: true },
           { label: "Unlimited reports", included: true },
@@ -444,11 +441,8 @@ const en: Dictionary = {
     body: "All the power of C-Legal in your hands. Download our app and transform the way you manage HSEQ: simpler, smarter and from anywhere.",
     access: "To access our app:",
     chooseStore: "Choose your store",
-    scan: "Scan",
     appStore: "Download on the App Store",
     googlePlay: "Get it on Google Play",
-    qrAppStore: "QR code for the App Store",
-    qrGooglePlay: "QR code for Google Play",
     requestAccess: "Request access",
     imageAlt: "Smartphone showing the Datasheq app home screen with the C-Legal and C-Controla modules.",
   },

@@ -37,7 +37,7 @@ Links are not variables: login, App Store / Google Play and the Datasheq site ar
 | `SENDGRID_FROM_NAME` | no | Sender name (default `C-Legal`) |
 | `CONTACT_TO_EMAIL` | yes | Company inbox(es) that receive each request, comma-separated |
 | `CLIENT_REPLY_TO` | no | Reply-To on the client email (default: first `CONTACT_TO_EMAIL`) |
-| `PUBLIC_BASE_URL` | no | e.g. `https://clegal.datasheq.com`. Used for the logo/links in emails, QR codes and SEO tags. Defaults to Railway's public domain |
+| `PUBLIC_BASE_URL` | no | e.g. `https://clegal.datasheq.com`. Used for the logo/links in emails and SEO tags. Defaults to Railway's public domain |
 | `SENDGRID_SANDBOX` | no | `true` = SendGrid validates but doesn't deliver (testing) |
 | `SENDGRID_DATA_RESIDENCY` | no | `eu` only for EU-residency SendGrid subusers |
 | `CONTACT_RATE_LIMIT` | no | Successful submissions per IP per 10 min (default 5) |
@@ -55,7 +55,7 @@ returns `{ status, version, mail: { configured, sandbox } }` without exposing va
 |---|---|---|
 | `loginUrl` | `https://app.datasheq.com` | "Inicio de sesión" button |
 | `datasheqUrl` | `https://web.datasheq.com` | "Conoce nuestras soluciones" |
-| `app.appStoreUrl` / `app.googlePlayUrl` | empty (fill in when published) | Store icons and QR codes, via `/app/ios` and `/app/android` (they open the "Descarga" section while empty) |
+| `app.appStoreUrl` / `app.googlePlayUrl` | empty (fill in when published) | Store icons, via `/app/ios` and `/app/android` (they open the "Descarga" section while empty) |
 
 ## Deploying to Railway
 

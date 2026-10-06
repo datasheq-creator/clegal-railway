@@ -40,7 +40,7 @@ export function About({ t }: { t: Dictionary["about"] }) {
   return (
     <section id="nosotros" aria-labelledby="nosotros-title" className="py-20 md:py-28">
       <div className="container-page grid items-center gap-14 lg:grid-cols-[1fr_1.1fr] lg:gap-12 xl:gap-16">
-        <div className="max-w-2xl">
+        <div className="mx-auto max-w-2xl text-center lg:mx-0 lg:text-left">
           <h2 id="nosotros-title" className="text-xs font-extrabold tracking-[0.14em] text-purple uppercase">
             {t.eyebrow}
           </h2>

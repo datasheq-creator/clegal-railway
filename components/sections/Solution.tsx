@@ -53,7 +53,7 @@ export function Solution({ t }: { t: Dictionary["solution"] }) {
               src={laptop}
               alt={problem.imageAlt}
               sizes="(min-width: 1280px) 470px, (min-width: 1024px) 38vw, (min-width: 768px) 46vw, 92vw"
-              className="relative -mb-6 h-auto w-[118%] max-w-none -translate-x-[16%] sm:-mb-8 lg:w-[140%] lg:-translate-x-[30%]"
+              className="relative -mb-6 h-auto w-[118%] max-w-none -translate-x-[8%] sm:-mb-8 md:-translate-x-[16%] lg:w-[140%] lg:-translate-x-[30%]"
             />
           </div>
         </article>

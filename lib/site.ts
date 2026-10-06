@@ -20,7 +20,7 @@ export const settings = {
   },
 
   app: {
-    // EDITAR: store links once the app is published. The store icons and the QR codes point to
+    // EDITAR: store links once the app is published. The store icons point to
     // /app/ios and /app/android, which redirect here; while empty they open the "Descarga" section.
     appStoreUrl: "",
     googlePlayUrl: "",
@@ -44,7 +44,7 @@ export const links = {
   playStore: settings.app.googlePlayUrl || null,
 } as const;
 
-/** Paths used by the store icons and QR codes (see app/app/ios, app/app/android). */
+/** Paths used by the store icons (see app/app/ios, app/app/android). */
 export const storePaths = { ios: "/app/ios", android: "/app/android" } as const;
 
 const stripSlash = (s: string) => s.replace(/\/+$/, "");

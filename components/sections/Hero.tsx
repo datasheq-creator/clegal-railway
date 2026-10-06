@@ -6,15 +6,15 @@ export function Hero({ t }: { t: Dictionary["hero"] }) {
   return (
     <section id="inicio" aria-labelledby="hero-title" className="relative overflow-hidden">
       <div className="container-page grid items-center gap-y-10 pt-12 md:pt-16 lg:min-h-[calc(100svh-6rem)] lg:max-h-[52rem] lg:grid-cols-[1.05fr_1fr] lg:gap-x-6 lg:pt-0">
-        <div className="max-w-[38rem] lg:pb-12">
+        <div className="mx-auto max-w-[38rem] text-center lg:mx-0 lg:pb-12 lg:text-left">
           <h1 id="hero-title" className="text-[clamp(2.25rem,1.2rem+2.4vw,2.75rem)] leading-[1.05] font-extrabold tracking-[-0.02em]">
             <span className="block text-ink">{t.title}</span>
             <span className="block text-purple xl:whitespace-nowrap">{t.highlight}</span>
           </h1>
-          <p className="mt-5 max-w-[34rem] text-[clamp(1.125rem,1rem+0.5vw,1.4rem)] leading-snug font-medium text-ink-muted">
+          <p className="mx-auto mt-5 max-w-[34rem] lg:mx-0 text-[clamp(1.125rem,1rem+0.5vw,1.4rem)] leading-snug font-medium text-ink-muted">
             {t.subtitle}
           </p>
-          <div className="mt-9 flex flex-col gap-3 xs:flex-row xs:gap-6">
+          <div className="mt-9 flex flex-col gap-3 xs:flex-row xs:justify-center xs:gap-6 lg:justify-start">
             <a href="#solucion" className="btn btn-primary h-14 px-8 text-[1.05rem] xs:min-w-52">
               {t.primaryCta}
             </a>
